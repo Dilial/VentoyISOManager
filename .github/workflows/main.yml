@@ -1,0 +1,86 @@
+name: 'Publish Tauri Release'
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión de la release (ej: 1.2.3)'
+        required: true
+        type: string
+      prerelease:
+        description: '¿Es una pre-release?'
+        required: false
+        default: false
+        type: boolean
+      bodyText:
+        description: 'Nueva version (ej: cambios realizados: ...)'
+        required: true
+        type: string
+
+jobs:
+  publish-tauri:
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'ubuntu-22.04'
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'pnpm'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libgtk-3-dev
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set version everywhere
+        run: |
+          pnpm version ${{ inputs.version }} --no-git-tag-version
+          sed -i 's/"version": "[^"]*"/"version": "${{ inputs.version }}"/' src-tauri/tauri.conf.json
+
+      - name: Create .env file for Rust build
+        run: |
+          cat > .env << EOF
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          EOF
+
+      - name: Build Tauri app
+        uses: tauri-apps/tauri-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v${{ inputs.version }}
+          releaseName: 'v${{ inputs.version }}'
+          releaseBody: '${{ inputs.bodyText }}'
+          releaseDraft: true
+          prerelease: ${{ inputs.prerelease }}
+          args: ${{ matrix.args }}
