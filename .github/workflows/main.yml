@@ -67,8 +67,9 @@ jobs:
           sed -i 's/"version": "[^"]*"/"version": "${{ inputs.version }}"/' src-tauri/tauri.conf.json
 
       - name: Create .env file for Rust build
+        shell: bash
         run: |
-          cat > .env << EOF
+          cat > .env << 'EOF'
           SUPABASE_URL=${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
           EOF
