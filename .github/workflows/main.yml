@@ -30,6 +30,7 @@ jobs:
             args: ''
           - platform: 'windows-latest'
             args: ''
+            portable: 'Portable EXE'
 
     runs-on: ${{ matrix.platform }}
 
@@ -67,14 +68,15 @@ jobs:
           sed -i 's/"version": "[^"]*"/"version": "${{ inputs.version }}"/' src-tauri/tauri.conf.json
 
       - name: Create .env file for Rust build
+        shell: bash
         run: |
-          cat > .env << EOF
+          cat > .env << 'EOF'
           SUPABASE_URL=${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
           EOF
 
       - name: Build Tauri app
-        uses: tauri-apps/tauri-action@v2
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
