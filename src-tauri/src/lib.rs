@@ -23,10 +23,11 @@ struct SupabaseRecord {
     id: i64,
     distro: String,
     version: String,
-    download_url: String,
+    download_url: Option<String>,
     sha256_hash: String,
-    checksum_url: String,
+    checksum_url: Option<String>,
     is_lts: bool,
+    size: Option<u64>
 }
 
 #[derive(serde::Serialize)]

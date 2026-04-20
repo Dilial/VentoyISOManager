@@ -4,6 +4,7 @@
   import Modal from "./lib/Modal.svelte";
   import IsoCloudMenu from "./lib/IsoCloudMenu.svelte";
   import Progressbar from "flowbite-svelte/Progressbar.svelte";
+  import { readableBytes } from "./lib/utils";
 
   interface FileInfo {
     name: string;
@@ -77,6 +78,7 @@
   async function listIsos() {
     try {
       isos = await invoke<FileInfo[]>("list_isos", { path: ISOsFolder });
+      diskSpaceInfo = await invoke<[number, number, number, number] | null>("fetch_disk_space", {path: ISOsFolder});
     } catch (error) {
       console.error("Error al listar ISOs:", error);
     }
@@ -268,8 +270,10 @@
         style="display: flex; justify-content: space-between; font-size: 0.85em; color: gray; margin-top: 6px;"
       >
         <!-- Conversión de Bytes a Gigabytes (dividiendo entre 1024^3) -->
-        <span>Libre: {(diskSpaceInfo[2] / 1073741824).toFixed(2)} GB</span>
-        <span>Total: {(diskSpaceInfo[0] / 1073741824).toFixed(2)} GB</span>
+        <!--<span>Libre: {(diskSpaceInfo[2] / 1073741824).toFixed(2)} GB</span>
+        <span>Total: {(diskSpaceInfo[0] / 1073741824).toFixed(2)} GB</span>-->
+        <span>Libre: {readableBytes(diskSpaceInfo[2])}</span>
+        <span>Total: {readableBytes(diskSpaceInfo[0])}</span>
       </div>
     </div>
   {/if}
@@ -358,4 +362,5 @@
   close={() => (isCloudMenuOpen = false)}
   {ISOsFolder}
   {listIsos}
+  {diskSpaceInfo}
 />

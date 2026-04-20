@@ -5,6 +5,7 @@
   import { ModalBuilder, type ModalConfig } from "./ModalBuilder";
   import Modal from "./Modal.svelte";
   import Progressbar from "flowbite-svelte/Progressbar.svelte";
+  import { readableBytes, compareVersions } from './utils';
   
   let activeModal: ModalConfig | null = null;
 
@@ -30,6 +31,8 @@
   let downloadProgress = 0;
   let currentFile = "";
   let unlistenProgress: (() => void) | undefined;
+
+  export let diskSpaceInfo: [number, number, number, number] | null = null;
 
   $: filteredDistros = uniqueDistros.filter(d => d.toLowerCase().includes(searchQuery.toLowerCase()));
   $: filteredVersions = distroVersions.filter(v => v.version.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -62,6 +65,7 @@
     isLoading = true; errorMsg = ''; searchQuery = '';
     try {
       distroVersions = await invoke('fetch_versions_for_distro', { distro });
+      distroVersions.sort(compareVersions);
       selectedDistro = distro;
     } 
     catch (err) { errorMsg = String(err); } 
@@ -81,6 +85,24 @@
     if (!folder) {
       folder = await invoke<string>('select_folder');
       if (!folder) return; 
+    }
+
+    if (!iso.download_url) {
+      activeModal = new ModalBuilder()
+        .setTitle("Error")
+        .setText("Esta versión no tiene una URL de descarga válida.")
+        .addButton("Cerrar", (close) => close(), true)
+        .build();
+      return;
+    }
+
+    if (diskSpaceInfo && iso.size && diskSpaceInfo[2] < iso.size) {
+      activeModal = new ModalBuilder()
+        .setTitle("Espacio Insuficiente")
+        .setText(`No hay suficiente espacio disponible para descargar esta ISO.\nRequerido: ${readableBytes(iso.size)}, Disponible: ${readableBytes(diskSpaceInfo[2])}`)
+        .addButton("Cerrar", (close) => close(), true)
+        .build();
+      return;
     }
     
     const separator = navigator.userAgent.includes('Win') ? '\\' : '/';
@@ -180,7 +202,14 @@
                       <span class="hash-label" style="font-size: 1.1em;">Versión {iso.version}</span>
                       {#if iso.is_lts} <span style="font-size: 0.8em; background-color: #2f855a; color: white; padding: 2px 4px; border-radius: 4px; margin-left:8px">LTS</span> {/if}
                     </div>
-                    <button on:click={() => handleDownload(iso)} style="background-color: #2f855a">⬇ Descargar</button>
+                    <span class="hash-label" style="font-size: 1.1em;">{readableBytes(iso.size) || 'Desconocido'}</span>
+                    <button on:click={() => handleDownload(iso)}
+                    disabled={!iso.download_url}
+                    style="background-color: {!iso.download_url ? '#444' : '#2f855a'};
+                    cursor: {!iso.download_url ? 'not-allowed' : 'pointer'};
+                    text-decoration: {!iso.download_url ? 'line-through' : 'none'};"
+                    >⬇ Descargar</button
+                    >
                   </li>
                 {/each}
               </ul>
