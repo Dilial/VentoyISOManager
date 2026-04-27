@@ -6,6 +6,7 @@
   import Modal from "./Modal.svelte";
   import Progressbar from "flowbite-svelte/Progressbar.svelte";
   import { readableBytes, compareVersions } from './utils';
+  import { t } from 'svelte-i18n';
   
   let activeModal: ModalConfig | null = null;
 
@@ -89,18 +90,18 @@
 
     if (!iso.download_url) {
       activeModal = new ModalBuilder()
-        .setTitle("Error")
-        .setText("Esta versión no tiene una URL de descarga válida.")
-        .addButton("Cerrar", (close) => close(), true)
+        .setTitle($t('download.url.title-error'))
+        .setText($t('download.url.message-error'))
+        .addButton($t('modal.close'), (close) => close(), true)
         .build();
       return;
     }
 
     if (diskSpaceInfo && iso.size && diskSpaceInfo[2] < iso.size) {
       activeModal = new ModalBuilder()
-        .setTitle("Espacio Insuficiente")
-        .setText(`No hay suficiente espacio disponible para descargar esta ISO.\nRequerido: ${readableBytes(iso.size)}, Disponible: ${readableBytes(diskSpaceInfo[2])}`)
-        .addButton("Cerrar", (close) => close(), true)
+        .setTitle($t('download.space.title-error'))
+        .setText($t('download.space.message-error', { values: { required: readableBytes(iso.size), available: readableBytes(diskSpaceInfo[2]) } }))
+        .addButton($t('modal.close'), (close) => close(), true)
         .build();
       return;
     }
@@ -120,17 +121,17 @@
         isDownloading = false;
         listIsos();
         activeModal = new ModalBuilder()
-          .setTitle("Iso Info")
-          .setText(`La iso se ha descargado con éxito en:\n${dest}`)
-          .addButton("Cerrar", (close) => close(), true)
+          .setTitle($t('download.title'))
+          .setText($t('download.message', { values: { isoName: iso.distro + '_' + iso.version } }))
+          .addButton($t('modal.close'), (close) => close(), true)
           .build();
       }, 500);
 
     } catch (err) {
       isDownloading = false;
       activeModal = new ModalBuilder()
-        .setTitle("Error")
-        .setText(`Error descargando la iso:\n${err}`)
+        .setTitle($t('download.title-error'))
+        .setText($t('download.message-error', { values: { isoName: iso.distro + '_' + iso.version } }))
         .build();
     }
   }
@@ -148,7 +149,7 @@
       
       {#if isDownloading}
         <div style="text-align: center; padding: 2rem 1rem;">
-          <h2 style="margin-top: 0">Descargando...</h2>
+          <h2 style="margin-top: 0">{$t('download.downloading', { values: { isoName: currentFile } })}</h2>
           <p style="margin-bottom: 1.5rem;">{currentFile}</p>
           
           <Progressbar
@@ -163,52 +164,52 @@
         
       {:else}
         {#if !selectedDistro}
-          <h3>☁️ Catálogo de SO Oficiales</h3>
+          <h3>{$t('iso-cloud.title')}</h3>
         {:else}
           <h3 style="display:flex; align-items:center; gap: 8px">
-            <button on:click={goBack} style="padding: 2px 8px; font-size:14px; background: transparent; color: #396cd8; border: none; cursor:pointer">← Atrás</button>
-            Versiones de {selectedDistro}
+            <button on:click={goBack} style="padding: 2px 8px; font-size:14px; background: transparent; color: #396cd8; border: none; cursor:pointer">{$t('iso-cloud.back')}</button>
+            {$t('iso-cloud.iso-selected.title', { values: { selectedDistro } })}
           </h3>
         {/if}
         
         <input 
           type="text" class="modal-input" 
-          placeholder={!selectedDistro ? "Buscar distribución..." : "Buscar versión (ej. 24.04)..."} 
+          placeholder={!selectedDistro ? $t('iso-cloud.search-placeholder') : $t('iso-cloud.iso-selected.search-message')} 
           bind:value={searchQuery}
           style="margin-bottom: 1rem;"
         />
 
         <div class="iso-list-container" style="max-height: 50vh; overflow-y: auto; padding: 1rem 0;">
           {#if isLoading}
-            <p class="modal-computing">Conectando con la base de datos...</p>
+            <p class="modal-computing">{$t('iso-cloud.loading')}</p>
           {:else if errorMsg}
             <p class="hash-fail">{errorMsg}</p>
           {:else if !selectedDistro}
-            {#if filteredDistros.length === 0} <p class="empty-state">Sin resultados.</p> {:else}
+            {#if filteredDistros.length === 0} <p class="empty-state">{$t('iso-cloud.no-results')}</p> {:else}
               <ul id="iso-list" style="margin: 0; padding: 0;">
                 {#each filteredDistros as distroOption}
                   <li style="margin-bottom: 0.5rem; cursor: pointer; display: flex; justify-content: space-between;" on:click={() => selectDistro(distroOption)}>
-                    <strong>{distroOption}</strong><span style="color:#666">Explorar →</span>
+                    <strong>{distroOption}</strong><span style="color:#666">{$t('iso-cloud.show-isos')}</span>
                   </li>
                 {/each}
               </ul>
             {/if}
           {:else}
-            {#if filteredVersions.length === 0} <p class="empty-state">Sin versiones aquí.</p> {:else}
+            {#if filteredVersions.length === 0} <p class="empty-state">{$t('iso-cloud.iso-selected.no-versions')}</p> {:else}
               <ul id="iso-list" style="margin: 0; padding: 0;">
                 {#each filteredVersions as iso}
                   <li style="margin-bottom: 0.5rem;">
                     <div style="flex-grow: 1;">
-                      <span class="hash-label" style="font-size: 1.1em;">Versión {iso.version}</span>
-                      {#if iso.is_lts} <span style="font-size: 0.8em; background-color: #2f855a; color: white; padding: 2px 4px; border-radius: 4px; margin-left:8px">LTS</span> {/if}
+                      <span class="hash-label" style="font-size: 1.1em;">{$t('iso-cloud.iso-selected.version', { values: { version: iso.version } })}</span>
+                      {#if iso.is_lts} <span style="font-size: 0.8em; background-color: #2f855a; color: white; padding: 2px 4px; border-radius: 4px; margin-left:8px">{$t('iso-cloud.iso-selected.lts')}</span> {/if}
                     </div>
-                    <span class="hash-label" style="font-size: 1.1em;">{readableBytes(iso.size) || 'Desconocido'}</span>
+                    <span class="hash-label" style="font-size: 1.1em;">{readableBytes(iso.size) || $t('iso-cloud.iso-selected.unknown-size')}</span>
                     <button on:click={() => handleDownload(iso)}
                     disabled={!iso.download_url}
                     style="background-color: {!iso.download_url ? '#444' : '#2f855a'};
                     cursor: {!iso.download_url ? 'not-allowed' : 'pointer'};
                     text-decoration: {!iso.download_url ? 'line-through' : 'none'};"
-                    >⬇ Descargar</button
+                    >{$t('iso-cloud.iso-selected.download')}</button
                     >
                   </li>
                 {/each}
@@ -218,7 +219,7 @@
         </div>
 
         <div class="modal-actions" style="margin-top: 1rem;">
-          <button on:click={close} style="background-color: transparent; border: 1px solid #ccc; color: inherit;">Cerrar Menú</button>
+          <button on:click={close} style="background-color: transparent; border: 1px solid #ccc; color: inherit;">{$t('iso-cloud.close-menu')}</button>
         </div>
       {/if}
       

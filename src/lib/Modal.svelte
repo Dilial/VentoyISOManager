@@ -13,7 +13,7 @@
 
 {#if config}
   <!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
-  <div class="modal-overlay" on:click|self={close}>
+  <div class="modal-overlay" >
     <div class="modal">
       {#if config.title}
         <h3>{config.title}</h3>

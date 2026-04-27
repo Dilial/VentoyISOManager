@@ -1,0 +1,90 @@
+{
+    "iso-delete": {
+        "title-delete": "Confirm deletion",
+        "message-delete": "Are you sure you want to delete the ISO {isoName}?",
+        "title-deleted": "ISO deleted",
+        "message-deleted": "The ISO {isoName} has been deleted successfully.",
+        "title-error": "Error deleting ISO",
+        "message-error": "Could not delete the ISO {isoName}. Please try again."
+    },
+    "hash": {
+        "title-verify": "Verify Hash",
+        "message-verify": "Enter the official hash to compare. Leave blank to only obtain the hash.",
+        "expected-hash-input": "Expected hash (optional)",
+        "calculating": "Calculating hash...",
+        "expected-hash": "Expected:",
+        "obtained-hash": "Obtained:",
+        "hash-result": "Hash Result",
+        "hash-match": "The hashes match. The ISO is correct.",
+        "hash-mismatch": "The hashes DO NOT match. The ISO may be corrupted or not official.",
+        "search-database": "Searching for hash in the database...",
+        "iso-info": "ISO Info",
+        "iso-message": "The ISO is {distro} with version {version}",
+        "title-error": "Error",
+        "message-error": "There was an error calculating the hash. Please try again.",
+        "iso-not-found-title": "ISO Information Not Found",
+        "iso-not-found-message": "ISO not found in the database. Could not retrieve additional information."
+    },
+    "tools": {
+        "select-folder": "Select Folder",
+        "list-isos": "List ISOs",
+        "download-iso": "Download ISOs",
+        "free-up-space": "Free:",
+        "total-space": "Total:"
+    },
+    "isos": {
+        "title": "Downloaded ISOs",
+        "back": "⇐",
+        "parent-folder": "Base",
+        "no-isos": "No ISOs downloaded. Use 'Download' to add one.",
+        "actions": {
+            "verify-distro": "Get distro",
+            "obtain-hash": "Obtain ISO hash",
+            "delete": "Delete ISO"
+        }
+    },
+    "download": {
+        "url": {
+            "title-error": "URL Error",
+            "message-error": "This version does not have a valid download URL."
+        },
+        "space": {
+            "title-error": "Insufficient space",
+            "message-error": "There is not enough space available to download this ISO.\nRequired: {required}, Available: {available}"
+        },
+        "downloading": "Downloading {isoName}...",
+        "title": "ISO downloaded",
+        "message": "The ISO {isoName} has been downloaded successfully.",
+        "title-error": "Error downloading ISO",
+        "message-error": "There was an error downloading the ISO {isoName}. Please try again."
+    },
+    "iso-cloud": {
+        "title": "Official OS Catalog",
+        "back": "⇐ Back",
+        "search-placeholder": "Search OS...",
+        "iso-selected": {
+            "title": "Versions for {selectedDistro}",
+            "search-message": "Search version (e.g. 24.04)...",
+            "no-versions": "No versions here.",
+            "version": "Version {version}",
+            "lts": "LTS",
+            "unknown-size": "Unknown",
+            "download": "⬇ Download"
+
+        },
+        "loading": "Connecting to the database...",
+        "no-results": "No results.",
+        "show-isos": "Explore →",
+        "close-menu": "Close Menu"
+    },
+    "modal": {
+        "delete": "delete",
+        "edit": "edit",
+        "add": "add",
+        "cancel": "cancel",
+        "close": "close",
+        "confirm": "confirm",
+        "error": "error",
+        "calculate": "calculate"
+    }
+}

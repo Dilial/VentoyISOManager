@@ -1,0 +1,90 @@
+{
+    "iso-delete": {
+        "title-delete": "",
+        "message-delete": "",
+        "title-deleted": "",
+        "message-deleted": "",
+        "title-error": "",
+        "message-error": ""
+    },
+    "hash": {
+        "title-verify": "",
+        "message-verify": "",
+        "expected-hash-input": "",
+        "calculating": "",
+        "expected-hash": "",
+        "obtained-hash": "",
+        "hash-result": "",
+        "hash-match": "",
+        "hash-mismatch": "",
+        "search-database": "",
+        "iso-info": "",
+        "iso-message": "",
+        "title-error": "",
+        "message-error": "",
+        "iso-not-found-title": "",
+        "iso-not-found-message": ""
+    },
+    "tools": {
+        "select-folder": "",
+        "list-isos": "",
+        "download-iso": "",
+        "free-up-space": "",
+        "total-space": ""
+    },
+    "isos": {
+        "title": "",
+        "back": "",
+        "parent-folder": "",
+        "no-isos": "",
+        "actions": {
+            "verify-distro": "",
+            "obtain-hash": "",
+            "delete": ""
+        }
+    },
+    "download": {
+        "url": {
+            "title-error": "",
+            "message-error": ""
+        },
+        "space": {
+            "title-error": "",
+            "message-error": ""
+        },
+        "downloading": "",
+        "title": "",
+        "message": "",
+        "title-error": "",
+        "message-error": ""
+    },
+    "iso-cloud": {
+        "title": "",
+        "back": "",
+        "search-placeholder": "",
+        "iso-selected": {
+            "title": "",
+            "search-message": "",
+            "no-versions": "",
+            "version": "",
+            "lts": "",
+            "unknown-size": "",
+            "download": ""
+
+        },
+        "loading": "",
+        "no-results": "",
+        "show-isos": "",
+        "close-menu": ""
+    },
+    "modal": {
+        "delete": "",
+        "edit": "",
+        "add": "",
+        "cancel": "",
+        "close": "",
+        "confirm": "",
+        "error": "",
+        "calculate": ""
+    }
+}

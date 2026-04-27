@@ -5,6 +5,7 @@
   import IsoCloudMenu from "./lib/IsoCloudMenu.svelte";
   import Progressbar from "flowbite-svelte/Progressbar.svelte";
   import { readableBytes } from "./lib/utils";
+  import { t } from 'svelte-i18n';
 
   interface FileInfo {
     name: string;
@@ -121,31 +122,43 @@
     console.log("deleteIso clicked for:", path);
     try {
       activeModal = new ModalBuilder()
-        .setTitle("Confirmar eliminación")
-        .setText("Estas seguro de que quieres eliminar la iso " + isoName)
-        .addButton("Cancelar", (close) => close())
-        .addButton("Confirmar", async (close) => {
+        .setTitle($t('iso-delete.title-delete'))
+        //.setText("Estas seguro de que quieres eliminar la iso " + isoName)
+        .setText($t('iso-delete.message-delete', {values: { isoName }}))
+        .addButton($t('modal.cancel'), (close) => close())
+        .addButton($t('modal.confirm'), async (close) => {
           await invoke("delete_iso", { path, isosFolder: ISOsFolder });
           await listIsos();
           close();
+          activeModal = new ModalBuilder()
+            .setTitle($t('iso-delete.title-deleted'))
+            //.setText(`La ISO ${isoName} ha sido eliminada correctamente.`)
+            .setText(`${$t('iso-delete.message-deleted', { values: { isoName } })}`)
+            .addButton($t('modal.close'), (close) => close(), true)
+            .build();
         })
         .build();
     } catch (error) {
       console.error("Error al eliminar la ISO:", error);
-      alert("Error al eliminar el archivo: " + error);
+      activeModal = new ModalBuilder()
+        .setTitle($t('iso-delete.title-error'))
+        //.setText("Hubo un error al eliminar el archivo.")
+        .setText($t('iso-delete.message-error', {values: { isoName }}))
+        .addButton($t('modal.close'), (close) => close())
+        .build();
     }
   }
 
   function startHash(isoName: string) {
     activeModal = new ModalBuilder()
-      .setTitle("Verificar Hash")
+      .setTitle($t('hash.title-verify'))
       .setText(
-        "Introduce el hash oficial para comparar. Déjalo en blanco para solo obtener el hash.",
+        $t('hash.message-verify'),
       )
-      .addInput("Hash esperado (opcional)")
-      .addButton("Cancelar", (close) => close())
+      .addInput($t('hash.expected-hash-input'))
+      .addButton($t('modal.close'), (close) => close())
       .addButton(
-        "Calcular",
+        $t('modal.calculate'),
         async (close, input) => {
           close();
           await computeAndShowHashResult(isoName, input || "");
@@ -161,58 +174,58 @@
   ) {
     // Show computing modal (no buttons)
     activeModal = new ModalBuilder()
-      .setText('<p class="modal-computing">Calculando hash...</p>')
-      .setHtmlText('<p class="modal-computing">Calculando hash...</p>')
+      .setText('<p class="modal-computing">'+$t('hash.calculating')+'</p>')
+      .setHtmlText('<p class="modal-computing">'+$t('hash.calculating')+'</p>')
       .build();
 
     try {
       const hash = await invoke<string>("obtain_hash", { path: isoName });
 
-      let resultHtml = `<h3>Resultado del Hash</h3>`;
+      let resultHtml = `<h3>${$t('hash.hash-result')}</h3>`;
 
       if (expectedHash === "") {
         resultHtml += `<p class="hash-display">${hash}</p>`;
       } else {
         const match = expectedHash.toLowerCase() === hash.toLowerCase();
         if (match) {
-          resultHtml += `<p class="hash-status hash-ok">Los hashes coinciden. La ISO es correcta.</p>
+          resultHtml += `<p class="hash-status hash-ok">${$t('hash.hash-match')}</p>
                           <p class="hash-display">${hash}</p>`;
         } else {
-          resultHtml += `<p class="hash-status hash-fail">Los hashes NO coinciden.</p>
-                          <p class="hash-label">Esperado:</p>
+          resultHtml += `<p class="hash-status hash-fail">${$t('hash.hash-mismatch')}</p>
+                          <p class="hash-label">${$t('hash.expected-hash')}:</p>
                           <p class="hash-display">${expectedHash}</p>
-                          <p class="hash-label">Obtenido:</p>
+                          <p class="hash-label">${$t('hash.obtained-hash')}:</p>
                           <p class="hash-display">${hash}</p>`;
         }
       }
 
       activeModal = new ModalBuilder()
         .setHtmlText(resultHtml)
-        .addButton("Cerrar", (close) => close(), true)
+        .addButton($t('modal.close'), (close) => close(), true)
         .build();
     } catch (error) {
       console.error("Error obtaining hash:", error);
       activeModal = new ModalBuilder()
-        .setTitle("Error")
-        .setText("Hubo un error al calcular el hash.")
-        .addButton("Cerrar", (close) => close())
+        .setTitle($t('hash.title-error'))
+        .setText($t('hash.message-error'))
+        .addButton($t('modal.close'), (close) => close())
         .build();
     }
   }
 
   async function verifyHash(isoName: string) {
     activeModal = new ModalBuilder()
-      .setText('<p class="modal-computing">Calculando hash...</p>')
-      .setHtmlText('<p class="modal-computing">Calculando hash...</p>')
+      .setText('<p class="modal-computing">'+$t('hash.calculating')+'</p>')
+      .setHtmlText('<p class="modal-computing">'+$t('hash.calculating')+'</p>')
       .build();
     const hash = await invoke<string>("obtain_hash", { path: isoName });
     console.log(hash);
     activeModal = new ModalBuilder()
       .setText(
-        '<p class="modal-computing">Buscando hash en la base de datos...</p>',
+        '<p class="modal-computing">'+$t('hash.search-database')+'</p>',
       )
       .setHtmlText(
-        '<p class="modal-computing">Buscando hash en la base de datos...</p>',
+        '<p class="modal-computing">'+$t('hash.search-database')+'</p>',
       )
       .build();
     const isoInfo = await invoke<{ distro: string; version: string } | null>(
@@ -221,19 +234,19 @@
     );
     if (isoInfo != null) {
       activeModal = new ModalBuilder()
-        .setTitle("Iso Info")
+        .setTitle($t('hash.iso-info'))
         .setText(
-          `La iso es de ${isoInfo?.distro} con la version ${isoInfo?.version}`,
+          $t('hash.iso-message', { values: { distro: isoInfo?.distro, version: isoInfo?.version } })
         )
-        .addButton("Cerrar", (close) => close(), true)
+        .addButton($t('modal.close'), (close) => close(), true)
         .build();
       return;
     }
 
     activeModal = new ModalBuilder()
-      .setTitle("Iso Info")
-      .setText(`ISO no encontrada en la base de datos`)
-      .addButton("Cerrar", (close) => close(), true)
+      .setTitle($t('hash.iso-not-found-title'))
+      .setText($t('hash.iso-not-found-message'))
+      .addButton($t('modal.close'), (close) => close(), true)
       .build();
   }
 </script>
@@ -242,8 +255,8 @@
   <h1>Ventoy ISO Manager</h1>
 
   <div class="toolbar">
-    <button on:click={selectFolder}>Seleccionar Carpeta</button>
-    <button on:click={listIsos}>Listar ISOs</button>
+    <button on:click={selectFolder}>{$t('tools.select-folder')}</button>
+    <button on:click={listIsos}>{$t('tools.list-isos')}</button>
   </div>
 
   <div class="toolbar">
@@ -251,7 +264,7 @@
       class="btn-download"
       on:click={() => (isCloudMenuOpen = true)}
       disabled={ISOsFolder == null || ISOsFolder == ""}
-      style="background-color: #2f855a;">Descargar ISOs</button
+      style="background-color: #2f855a;">{$t('tools.download-iso')}</button
     >
   </div>
   <div class="toolbar"></div>
@@ -272,14 +285,14 @@
         <!-- Conversión de Bytes a Gigabytes (dividiendo entre 1024^3) -->
         <!--<span>Libre: {(diskSpaceInfo[2] / 1073741824).toFixed(2)} GB</span>
         <span>Total: {(diskSpaceInfo[0] / 1073741824).toFixed(2)} GB</span>-->
-        <span>Libre: {readableBytes(diskSpaceInfo[2])}</span>
-        <span>Total: {readableBytes(diskSpaceInfo[0])}</span>
+        <span>{$t('tools.free-up-space')} {readableBytes(diskSpaceInfo[2])}</span>
+        <span>{$t('tools.total-space')} {readableBytes(diskSpaceInfo[0])}</span>
       </div>
     </div>
   {/if}
 
   <section class="iso-list-container">
-    <h2>ISOs Descargadas</h2>
+    <h2>{$t('isos.title')}</h2>
     <ul id="iso-list">
       {#if ISOsFolder != "" && ISOsFolder != null}
         <div class="breadcrumb-nav">
@@ -287,12 +300,12 @@
             class="btn-back"
             on:click={goBack}
             disabled={ISOsFolder === ISOsParentFolder}
-            title="Volver atras">⇐</button
+            title="Volver atras">{$t('isos.back')}</button
           >
           <div class="breadcrumbs">
             <span
               class="breadcrumbs-item"
-              on:click={() => navigate(ISOsParentFolder)}>Base</span
+              on:click={() => navigate(ISOsParentFolder)}>{$t('isos.parent-folder')}</span
             >
             {#each breadcrumbs as crumb, i}
               <span class="breadcrumb-separator">/</span>
@@ -312,7 +325,7 @@
       {/if}
       {#if isos.length === 0}
         <li class="empty-state">
-          No hay ISOs descargadas. Usa 'Descargar' para agregar una.
+          {$t('isos.no-isos')}
         </li>
       {:else}
         {#each isos as isoName}
@@ -328,17 +341,17 @@
                 <button
                   class="btn-delete-iso"
                   on:click={() => deleteIso(isoName.full_path, isoName.name)}
-                  >Eliminar ISO</button
+                  >{$t('isos.actions.delete')}</button
                 >
                 <button
                   class="btn-obtain-iso-hash"
                   on:click={() => startHash(isoName.full_path)}
-                  >Obtener hash ISO</button
+                  >{$t('isos.actions.obtain-hash')}</button
                 >
                 <button
                   class="btn-obtain-iso-info"
                   on:click={() => verifyHash(isoName.full_path)}
-                  >Obtener Distro</button
+                  >{$t('isos.actions.verify-distro')}</button
                 >
               </div>
             </li>
