@@ -20,7 +20,7 @@
     "@tauri-apps/cli": "^2",
     "flowbite": "^4.0.1",
     "flowbite-svelte": "^1.33.0",
-    "postcss": "^8.5.8",
+    "postcss": "^8.5.12",
     "svelte": "^5.53.12",
     "svelte-i18n": "^4.0.1",
     "tailwindcss": "^4.2.2",
