@@ -85,45 +85,11 @@
     }
   }
 
-  /*async function downloadIso() {
-    console.log("downloadIso clicked");
-  }*/
-
-  /*async function updateIso(isoName: string) {
-    console.log("updateIso clicked for:", isoName);
-    activeModal = new ModalBuilder()
-      .setText('<p class="modal-computing">Calculando hash...</p>')
-      .setHtmlText('<p class="modal-computing">Calculando hash...</p>')
-      .build();
-    const hash = await invoke<string>("obtain_hash", { path: isoName });
-    console.log(hash);
-    activeModal = new ModalBuilder()
-      .setText('<p class="modal-computing">Buscando hash en la base de datos...</p>')
-      .setHtmlText('<p class="modal-computing">Buscando hash en la base de datos...</p>')
-      .build();
-    const isoInfo = await invoke<{distro: string, version: string} | null>("verify_hash", { hash: hash });
-    if (isoInfo != null) {
-      activeModal = new ModalBuilder()
-        .setTitle("Iso Info")
-        .setText(`La iso es de ${isoInfo?.distro} con la version ${isoInfo?.version}`)
-        .addButton("Cerrar", (close) => close(), true)
-        .build();
-        return;
-    }
-    activeModal = new ModalBuilder()
-      .setTitle("Iso Info")
-      .setText(`ISO no encontrada en la base de datos`)
-      .addButton("Cerrar", (close) => close(), true)
-      .build();
-
-  }*/
-
   async function deleteIso(path: string, isoName: string) {
     console.log("deleteIso clicked for:", path);
     try {
       activeModal = new ModalBuilder()
         .setTitle($t('iso-delete.title-delete'))
-        //.setText("Estas seguro de que quieres eliminar la iso " + isoName)
         .setText($t('iso-delete.message-delete', {values: { isoName }}))
         .addButton($t('modal.cancel'), (close) => close())
         .addButton($t('modal.confirm'), async (close) => {
@@ -132,7 +98,6 @@
           close();
           activeModal = new ModalBuilder()
             .setTitle($t('iso-delete.title-deleted'))
-            //.setText(`La ISO ${isoName} ha sido eliminada correctamente.`)
             .setText(`${$t('iso-delete.message-deleted', { values: { isoName } })}`)
             .addButton($t('modal.close'), (close) => close(), true)
             .build();
@@ -142,7 +107,6 @@
       console.error("Error al eliminar la ISO:", error);
       activeModal = new ModalBuilder()
         .setTitle($t('iso-delete.title-error'))
-        //.setText("Hubo un error al eliminar el archivo.")
         .setText($t('iso-delete.message-error', {values: { isoName }}))
         .addButton($t('modal.close'), (close) => close())
         .build();
@@ -172,7 +136,6 @@
     isoName: string,
     expectedHash: string,
   ) {
-    // Show computing modal (no buttons)
     activeModal = new ModalBuilder()
       .setText('<p class="modal-computing">'+$t('hash.calculating')+'</p>')
       .setHtmlText('<p class="modal-computing">'+$t('hash.calculating')+'</p>')
@@ -333,11 +296,6 @@
             <li>
               <span>{isoName.name}</span>
               <div class="iso-actions">
-                <!--<button
-                  class="btn-update-iso"
-                  on:click={() => updateIso(isoName.full_path)}
-                  >Actualizar ISO</button
-              >-->
                 <button
                   class="btn-delete-iso"
                   on:click={() => deleteIso(isoName.full_path, isoName.name)}
