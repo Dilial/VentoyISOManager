@@ -86,5 +86,18 @@
         "confirm": "",
         "error": "",
         "calculate": ""
+    },
+    "suggestion": {
+        "button": "",
+        "title": "",
+        "title-placeholder": "",
+        "message": "",
+        "message-placeholder": "",
+        "submit": "",
+        "close": "",
+        "success-title": "",
+        "success-message": "",
+        "error-title": "",
+        "error-message": ""
     }
 }

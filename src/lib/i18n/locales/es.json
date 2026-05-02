@@ -86,5 +86,18 @@
         "confirm": "confirmar",
         "error": "error",
         "calculate": "calcular"
+    },
+    "suggestion": {
+        "button": "Sugerencias y Feedback",
+        "title": "Sugerencias y Feedback",
+        "title-placeholder": "Título de tu sugerencia",
+        "message": "Mensaje",
+        "message-placeholder": "Describe tu sugerencia o feedback...",
+        "submit": "Enviar",
+        "close": "Cerrar",
+        "success-title": "Sugerencia Enviada",
+        "success-message": "Tu sugerencia ha sido enviada correctamente.",
+        "error-title": "Error al Enviar Sugerencia",
+        "error-message": "Hubo un error al enviar tu sugerencia. Por favor, inténtalo de nuevo."
     }
 }

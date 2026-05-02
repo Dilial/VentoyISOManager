@@ -31,4 +31,5 @@ rfd = "0.17.2"
 sha2 = "0.10.9"
 dotenvy = "0.15.7"
 sysinfo = { version = "0.38.4", features = ["disk"] }
+uuid = { version = "1.23.1", features = ["v4"] }
 

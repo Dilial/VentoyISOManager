@@ -94,6 +94,18 @@ button:active {
   flex-grow: 1;
 }
 
+p.empty-state {
+  padding: 0.75rem;
+  justify-content: center;
+  text-align: center;
+  color: #aaa;
+  font-style: italic;
+  background-color: #333;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: default;
+}
+
 #iso-list {
   list-style: none;
   padding: 0;
@@ -392,5 +404,108 @@ button:active {
 
   .breadcrumb-separator {
     color: #666;
+  }
+}
+
+/* Suggestion */
+.suggestion-modal {
+  max-width: 550px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.suggestion-header {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.8rem;
+}
+
+.suggestion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.suggestion-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.suggestion-field label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.suggestion-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #ddd;
+}
+
+.btn-suggestion-close {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  color: inherit;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  box-shadow: none;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-suggestion-close:hover {
+  background-color: #f0f0f0;
+  border-color: #999;
+}
+
+.btn-suggestion-send {
+  background-color: #2f855a;
+  border: none;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-suggestion-send:hover {
+  background-color: #276749;
+}
+
+.btn-suggestion-send:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-color-scheme: dark) {
+  .suggestion-header {
+    border-bottom-color: #444;
+  }
+
+  .suggestion-field label {
+    color: #ccc;
+  }
+
+  .suggestion-actions {
+    border-top-color: #444;
+  }
+
+  .btn-suggestion-close {
+    border-color: #555;
+  }
+
+  .btn-suggestion-close:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: #888;
   }
 }

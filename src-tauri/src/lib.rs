@@ -1,4 +1,4 @@
-use futures_util::{StreamExt /* io::{self, BufReader} */};
+use futures_util::StreamExt;
 use reqwest::Client;
 use rfd::FileDialog;
 use sha2::{Digest, Sha256};
@@ -8,6 +8,7 @@ use std::{env, fs};
 use std::{fs::File, io::Write, path::PathBuf};
 use sysinfo::Disks;
 use tauri::Emitter;
+use uuid::Uuid;
 
 #[derive(serde::Serialize)]
 pub struct FileInfo {
@@ -27,7 +28,7 @@ struct SupabaseRecord {
     sha256_hash: String,
     checksum_url: Option<String>,
     is_lts: bool,
-    size: Option<u64>
+    size: Option<u64>,
 }
 
 #[derive(serde::Serialize)]
@@ -45,12 +46,6 @@ struct DistroRow {
 struct ProgressPayload {
     downloaded: u64,
     total: u64,
-}
-
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
 #[tauri::command]
@@ -133,15 +128,15 @@ async fn delete_iso(path: String, isos_folder: String) -> Result<(), String> {
     let path_buf = Path::new(&path);
 
     if !path.starts_with(&isos_folder) {
-        return Err("El archivo especificado no esta en el directorio de trabajo".to_string());
+        return Err("The specified file is not in the working directory".to_string());
     }
 
     if path_buf.extension().and_then(|s| s.to_str()) != Some("iso") {
-        return Err("Solo se permite eliminar archivos .iso".to_string());
+        return Err("Only .iso files can be deleted".to_string());
     }
 
     if !path_buf.exists() {
-        return Err("El archivo no existe".to_string());
+        return Err("The specified file does not exist".to_string());
     }
 
     fs::remove_file(path).map_err(|e| e.to_string())?;
@@ -187,7 +182,7 @@ async fn verify_hash(hash: String) -> Result<Option<IsoResult>, String> {
         }
     } else {
         let error_text = res.text().await.unwrap_or_default();
-        Err(format!("Error de Supabase: {}", error_text))
+        Err(format!("Error of Supabase: {}", error_text))
     }
 }
 
@@ -220,7 +215,7 @@ async fn fetch_unique_distros() -> Result<Vec<String>, String> {
         Ok(unique_distros)
     } else {
         let error_text = res.text().await.unwrap_or_default();
-        Err(format!("Error de Supabase: {}", error_text))
+        Err(format!("Error of Supabase: {}", error_text))
     }
 }
 
@@ -255,8 +250,8 @@ async fn fetch_versions_for_distro(distro: String) -> Result<Vec<SupabaseRecord>
 
         Ok(records)
     } else {
-        let error_text = res.text().await.unwrap_or_default();
-        Err(format!("Error de Supabase: {}", error_text))
+        let error_text: String = res.text().await.unwrap_or_default();
+        Err(format!("Error of Supabase: {}", error_text))
     }
 }
 
@@ -280,19 +275,56 @@ async fn fetch_disk_space(path: String) -> Option<(u64, u64, u64, f64)> {
         let available = disk.available_space();
         let used = total.saturating_sub(available);
 
-        // Cálculo correcto del porcentaje
         let used_percent = if total == 0 {
             0.0
         } else {
             (used as f64 / total as f64) * 100.0
         };
 
-        // Opcional: redondear a 2 decimales
         let used_percent = (used_percent * 100.0).round() / 100.0;
 
         Some((total, used, available, used_percent))
     } else {
         None
+    }
+}
+
+#[tauri::command]
+async fn submit_suggestion(name: String, message: String) -> Result<(), String> {
+    let supabase_url = std::env::var("SUPABASE_URL")
+        .unwrap_or_default()
+        .to_string();
+    let supabase_key = std::env::var("SUPABASE_ANON_KEY")
+        .unwrap_or_default()
+        .to_string();
+    let bucket_name = "suggestions";
+    let folder_name = "pending";
+    let suggestion_id = Uuid::new_v4();
+    let file_name = format!("{}_{}.txt", name, suggestion_id);
+    let url = reqwest::Url::parse_with_params(
+        &format!(
+            "{}/storage/v1/object/{}/{}/{}",
+            supabase_url, bucket_name, folder_name, file_name
+        ),
+        &[("name", file_name.as_str())],
+    )
+    .map_err(|e| e.to_string())?;
+    let client = Client::new();
+    let res = client
+        .post(url)
+        .header("apikey", &supabase_key)
+        .header("Authorization", format!("Bearer {}", supabase_key))
+        .header("Content-Type", "text/plain")
+        .body(message)
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if res.status().is_success() {
+        Ok(())
+    } else {
+        let error_text: String = res.text().await.unwrap_or_default();
+        Err(format!("Error of Supabase: {}", error_text))
     }
 }
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -302,7 +334,6 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
-            greet,
             list_isos,
             download_iso,
             select_folder,
@@ -311,7 +342,8 @@ pub fn run() {
             verify_hash,
             fetch_unique_distros,
             fetch_versions_for_distro,
-            fetch_disk_space
+            fetch_disk_space,
+            submit_suggestion
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
