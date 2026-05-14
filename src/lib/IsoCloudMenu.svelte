@@ -188,6 +188,7 @@
             {#if filteredDistros.length === 0} <p class="empty-state">{$t('iso-cloud.no-results')}</p> {:else}
               <ul id="iso-list" style="margin: 0; padding: 0;">
                 {#each filteredDistros as distroOption}
+                  <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
                   <li style="margin-bottom: 0.5rem; cursor: pointer; display: flex; justify-content: space-between;" on:click={() => selectDistro(distroOption)}>
                     <strong>{distroOption}</strong><span style="color:#666">{$t('iso-cloud.show-isos')}</span>
                   </li>

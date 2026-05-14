@@ -98,6 +98,8 @@
         "success-title": "Sugerencia Enviada",
         "success-message": "Tu sugerencia ha sido enviada correctamente.",
         "error-title": "Error al Enviar Sugerencia",
-        "error-message": "Hubo un error al enviar tu sugerencia. Por favor, inténtalo de nuevo."
+        "error-message": "Hubo un error al enviar tu sugerencia. Por favor, inténtalo de nuevo.",
+        "validation-title": "Error de Validación",
+        "validation-message": "Por favor, completa ambos campos de título y mensaje antes de enviar."
     }
 }

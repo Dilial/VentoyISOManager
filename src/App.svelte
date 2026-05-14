@@ -280,6 +280,8 @@
             title="Volver atras">{$t("isos.back")}</button
           >
           <div class="breadcrumbs">
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
             <span
               class="breadcrumbs-item"
               on:click={() => navigate(ISOsParentFolder)}
@@ -287,6 +289,8 @@
             >
             {#each breadcrumbs as crumb, i}
               <span class="breadcrumb-separator">/</span>
+              <!-- svelte-ignore a11y_click_events_have_key_events -->
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
               <span
                 class="breadcrumb-item"
                 on:click={() => {
@@ -329,6 +333,8 @@
               </div>
             </li>
           {:else}
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
             <li
               class="directory-item"
               on:click={() => navigate(isoName.full_path)}

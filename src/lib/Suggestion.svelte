@@ -21,6 +21,15 @@
       const title = (document.getElementById('suggestion') as HTMLInputElement).value;
       const message = (document.getElementById('message') as HTMLTextAreaElement).value;
 
+      if (!title.trim() || !message.trim()) {
+        activeModal = new ModalBuilder()
+          .setTitle($t('suggestion.validation-title'))
+          .setText($t('suggestion.validation-message'))
+          .addButton($t('suggestion.close'), (close: () => any) => close())
+          .build();
+        return;
+      }
+
       invoke('submit_suggestion', { name: title, message })
       activeModal = new ModalBuilder()
         .setTitle($t('suggestion.success-title'))

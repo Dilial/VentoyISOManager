@@ -98,6 +98,8 @@
         "success-title": "",
         "success-message": "",
         "error-title": "",
-        "error-message": ""
+        "error-message": "",
+        "validation-title": "",
+        "validation-message": ""
     }
 }

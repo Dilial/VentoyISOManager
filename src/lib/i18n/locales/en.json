@@ -98,6 +98,8 @@
         "success-title": "Suggestion Submitted",
         "success-message": "Your suggestion has been submitted successfully.",
         "error-title": "Error Submitting Suggestion",
-        "error-message": "There was an error submitting your suggestion. Please try again."
+        "error-message": "There was an error submitting your suggestion. Please try again.",
+        "validation-title": "Validation Error",
+        "validation-message": "Please fill in both the title and message fields before submitting."
     }
 }
